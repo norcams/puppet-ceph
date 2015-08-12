@@ -109,6 +109,7 @@ class ceph::profile::params (
   $mon_keyring = undef,
   $client_keys = {},
   $osds = undef,
+  $pools = undef,
   $manage_repo = true,
 ) {
   validate_hash($client_keys)

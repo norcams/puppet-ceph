@@ -47,3 +47,13 @@ ceph::profile::params::osds:
     journal: '/dev/sdb1'
   '/dev/sdd':
     journal: '/dev/sdb2'
+
+ceph::profile::params::pools:
+  'volumes':
+     pg_num: 128
+  'images':
+     pg_num: 128
+  'backups':
+     pg_num: 128
+  'vms':
+     pg_num: 128
