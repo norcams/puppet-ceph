@@ -35,6 +35,14 @@
 #   Optional. Defaults to co-locating the journal with the data
 #   defined by *title*.
 #
+# [*wal_device*] The bluestore write-ahead log for the OSD
+#   Optional. Defaults to co-locating the write-ahead log with
+#   the data defined by *title*.
+#
+# [*db_device*] The bluestore metadata cache for the OSD
+#   Optional. Defaults to co-locating the metadata with
+#   the data defined by *title*.
+#
 # [*cluster*] The ceph cluster
 #   Optional. Same default as ceph.
 #
@@ -51,6 +59,8 @@
 define ceph::osd (
   $ensure = present,
   $journal = "''",
+  $db_device = undef,
+  $wal_device = undef,
   $cluster = undef,
   $exec_timeout = $::ceph::params::exec_timeout,
   $selinux_file_context = 'ceph_var_lib_t',
@@ -67,6 +77,14 @@ define ceph::osd (
       $cluster_name = 'ceph'
     }
     $cluster_option = "--cluster ${cluster_name}"
+
+    if $wal_device {
+      $conf_wal_device = "--block.wal $wal_device"
+    }
+
+    if $db_device {
+      $conf_db_device = "--block.db $db_device"
+    }
 
     if $ensure == present {
 
@@ -130,7 +148,7 @@ if ! test -b \$disk ; then
         chown -h ceph:ceph \$disk
     fi
 fi
-ceph-disk prepare ${cluster_option} ${fsid_option} $(readlink -f ${data}) $(readlink -f ${journal})
+ceph-disk prepare ${cluster_option} ${fsid_option} $(readlink -f ${data}) $(readlink -f ${journal}) $conf_wal_device $conf_db_device
 udevadm settle
 ",
         unless    => "/bin/true # comment to satisfy puppet syntax requirements
